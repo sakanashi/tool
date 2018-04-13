@@ -1,0 +1,38 @@
+<html lang="ja">
+<head>
+  <script type="text/javascript">
+    function toText() {
+      var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
+      var lines = input.split( '\n' );
+      var outArray = new Array();
+      var outputstr = "* やったこと\n（※ ■: やった,  □: やれなかった）\n\n"
+
+      for ( var i = 0; i < lines.length; i++ ) {
+        if ( lines[i] != '' ) {
+          lines[i] += "~\n"
+          if (lines[i].indexOf("■") === 0　|| lines[i].indexOf("□") === 0) {
+            lines[i] = "　" + lines[i]
+          }
+        } else {
+          lines[i] += "\n"
+        }
+        outputstr += lines[i]
+        outArray.push( lines[i] );
+      }
+      output(outputstr)
+    }
+
+    function output(s) {
+      document.getElementById('outputArea').value = s;
+    }
+  </script>
+  <style type="text/css"></style>
+</head>
+<body>
+
+  <textarea id="inputArea" class="inputArea" rows="15" cols="100"></textarea> <br>
+  <input type="button" name="btn2Text" value="convert" onclick="toText();"> <br>
+  <textarea id="outputArea" class="outputArea" rows="15" cols="100" readonly></textarea>
+
+</body>
+</html>
