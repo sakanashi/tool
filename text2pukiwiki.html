@@ -1,58 +1,92 @@
 <html lang="ja">
 <head>
   <script type="text/javascript">
-    function text2pukiwikiTask() {
-      var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-      var lines = input.split( '\n' );
-      var outputstr = "* やったこと\n（※ ■: やった,  □: やれなかった）\n\n";
+   function text2pukiwikiTask() {
+       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
+       var lines = input.split( '\n' );
+       var outputstr = "* やったこと\n（※ ■: やった,  □: やれなかった）\n\n";
 
-      for ( var i = 0; i < lines.length; i++ ) {
-        if ( lines[i] != '' ) {
-          lines[i] += "~\n";
-          if (lines[i].match(/^(□|■| |　).*/)) {
-            lines[i] = "　" + lines[i];
-          }
-        } else {
-          lines[i] += "\n";
-        }
-        outputstr += lines[i];
-      }
-      output(outputstr);
-    }
+       for ( var i = 0; i < lines.length; i++ ) {
+           if ( lines[i] != '' ) {
+               lines[i] += "~\n";
+               if (lines[i].match(/^(□|■|　).*/)) {
+                   lines[i] = "　" + lines[i];
+               }
+           } else {
+               lines[i] += "\n";
+           }
+           outputstr += lines[i];
+       }
+       output(outputstr);
+   }
 
-    function text2pukiwiki() {
-      var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-      var lines = input.split( '\n' );
-      var outputstr = "";
+   function text2pukiwiki() {
+       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
+       var lines = input.split( '\n' );
+       var outputstr = "";
 
-      for ( var i = 0; i < lines.length; i++ ) {
-        if ( lines[i] != '' ) {
-          lines[i] += "~\n";
-          if (lines[i].match(/^ .*/)) {
-            lines[i] = " " + lines[i];
-          } else if(lines[i].match(/^　.*/)) {
-            lines[i] = "　" + lines[i];
-          }
-        } else {
-          lines[i] += "\n";
-        }
-        outputstr += lines[i];
-      }
-      output(outputstr);
-    }
+       for ( var i = 0; i < lines.length; i++ ) {
+           if ( lines[i] != '' ) {
+               lines[i] += "~\n";
+               if (lines[i].match(/^ .*/)) {
+                   lines[i].trim()
+               } else if(lines[i].match(/^　.*/)) {
+                   lines[i] = "　" + lines[i];
+               }
+           } else {
+               lines[i] += "\n";
+           }
+           outputstr += lines[i];
+       }
+       output(outputstr);
+   }
 
-    function output(s) {
-      document.getElementById('outputArea').value = s;
-    }
+   function markdown2pukiwiki() {
+       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
+       var lines = input.split( '\n' );
+       var outputstr = "";
+
+       for ( var i = 0; i < lines.length; i++ ) {
+           if ( lines[i] != '' ) {
+               requireTilda = true
+               if (lines[i].startsWith('#')) {  // 見出し
+                   lines[i] = lines[i].replace(/#/g, '*');
+                   requireTilda = false
+               } else if (lines[i].trim().startsWith('*')){ // 箇条書き
+                   pattern = '-'.repeat(Math.floor((lines[i].indexOf('*') + 1) / 4) + 1);
+                   if (pattern.length <= 3) {
+                       lines[i] = pattern + lines[i].trim().replace(/\*/g, '');
+                   } else {
+                       lines[i] = '---' + '　 '.repeat(pattern.length - 3) + lines[i].trim().replace(/\*/g, '');
+                   }
+               } else if (lines[i].match(/^ .*/)) {  // 半角スペース始まり（とりあえずスペース削除）
+                   lines[i].trim();
+               } else if(lines[i].match(/^　.*/)) {  // 全角スペース始まり（なにもしない）
+               } else {
+               }
+               if (requireTilda) lines[i] += "~";
+               lines[i] += "\n";
+           } else {
+               lines[i] += "\n";
+           }
+           outputstr += lines[i];
+       }
+       output(outputstr);
+   }
+   
+   function output(s) {
+       document.getElementById('outputArea').value = s;
+   }
   </script>
   <style type="text/css"></style>
 </head>
 <body>
 
-  <textarea id="inputArea" class="inputArea" rows="15" cols="100"></textarea> <br>
+  <textarea id="inputArea" class="inputArea" rows="30" cols="100"></textarea> <br>
   <input type="button" name="btn2Text" value="text->pukiwikiTask" onclick="text2pukiwikiTask();">
-  <input type="button" name="btn2Text" value="text->pukiwiki" onclick="text2pukiwiki();"> <br>
-  <textarea id="outputArea" class="outputArea" rows="15" cols="100" readonly></textarea>
+  <input type="button" name="btn2Text" value="text->pukiwiki" onclick="text2pukiwiki();">
+  <input type="button" name="btn2Text" value="markdown->pukiwiki" onclick="markdown2pukiwiki();"> <br>
+  <textarea id="outputArea" class="outputArea" rows="30" cols="100"></textarea>
 
 </body>
 </html>
