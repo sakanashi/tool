@@ -73,7 +73,19 @@
        }
        output(outputstr);
    }
-   
+
+   function addQuotations() {
+       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
+       var lines = input.split( '\n' );
+       var outputstr = "";
+
+       for ( var i = 0; i < lines.length; i++ ) {
+           lines[i] = '> ' + lines[i] + '\n';
+           outputstr += lines[i];
+       }
+       output(outputstr);
+   }
+
    function output(s) {
        document.getElementById('outputArea').value = s;
    }
@@ -85,7 +97,8 @@
   <textarea id="inputArea" class="inputArea" rows="30" cols="100"></textarea> <br>
   <input type="button" name="btn2Text" value="text->pukiwikiTask" onclick="text2pukiwikiTask();">
   <input type="button" name="btn2Text" value="text->pukiwiki" onclick="text2pukiwiki();">
-  <input type="button" name="btn2Text" value="markdown->pukiwiki" onclick="markdown2pukiwiki();"> <br>
+  <input type="button" name="btn2Text" value="markdown->pukiwiki" onclick="markdown2pukiwiki();">
+  <input type="button" name="btn2Text" value="引用符" onclick="addQuotations();"> <br>
   <textarea id="outputArea" class="outputArea" rows="30" cols="100"></textarea>
 
 </body>
