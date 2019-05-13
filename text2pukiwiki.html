@@ -41,7 +41,7 @@
        output(outputstr);
    }
 
-   function markdown2pukiwiki() {
+   function markdown2pukiwiki(tabnum) {
        var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
        var lines = input.split( '\n' );
        var outputstr = "";
@@ -53,7 +53,7 @@
                    lines[i] = lines[i].replace(/#/g, '*');
                    requireTilda = false
                } else if (lines[i].trim().startsWith('*')){ // 箇条書き
-                   pattern = '-'.repeat(Math.floor((lines[i].indexOf('*') + 1) / 4) + 1);
+                   pattern = '-'.repeat(Math.floor((lines[i].indexOf('*') + 1) / tabnum) + 1);
                    if (pattern.length <= 3) {
                        lines[i] = pattern + lines[i].trim().replace(/\*/g, '');
                    } else {
@@ -109,7 +109,9 @@
   <textarea id="inputArea" class="inputArea" rows="30" cols="100"></textarea> <br>
   <input type="button" name="btn2Text" value="text->pukiwikiTask" onclick="text2pukiwikiTask();">
   <input type="button" name="btn2Text" value="text->pukiwiki" onclick="text2pukiwiki();">
-  <input type="button" name="btn2Text" value="markdown->pukiwiki" onclick="markdown2pukiwiki();">
+  <input type="button" name="btn2Text" value="markdown->pukiwiki(tab: 4)" onclick="markdown2pukiwiki(4);">
+  <input type="button" name="btn2Text" value="markdown->pukiwiki(tab: 2)" onclick="markdown2pukiwiki(2);">
+  <br/>
   <input type="button" name="btn2Text" value="引用符" onclick="addQuotations();">
   <input type="button" name="btn2Text" value="text->markdown breaks" onclick="addMarkdownBreaks();">
   <br>
