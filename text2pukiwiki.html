@@ -4,7 +4,7 @@
    function text2pukiwikiTask() {
        var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
        var lines = input.split( '\n' );
-       var outputstr = "* やったこと\n（※ ■: やった,  □: やれなかった）\n\n";
+       var outputstr = "* TODO\n（※ ■: やった,  □: やれなかった）\n\n";
 
        for ( var i = 0; i < lines.length; i++ ) {
            if ( lines[i] != '' ) {
