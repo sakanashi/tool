@@ -1,0 +1,35 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+    echo "table_diff_sql: Generate sql that outputs difference between two tables"
+    echo "usage: ./table_diff_sql table_name1 table_name2"
+    exit 1
+fi
+
+TBL1=$1
+TBL2=$2
+
+cat <<EOF
+only_in_${TBL1} AS (
+  SELECT
+    '${TBL1}' AS which_table, *
+  FROM (
+    SELECT * FROM ${TBL1}
+    EXCEPT
+    SELECT * FROM ${TBL2}
+  )
+),
+only_in_${TBL2} AS (
+  SELECT
+    '${TBL2}' AS which_table, *
+  FROM (
+    SELECT * FROM ${TBL2}
+    EXCEPT
+    SELECT * FROM ${TBL1}
+  )
+)
+SELECT * FROM only_in_${TBL1}
+UNION ALL
+SELECT * FROM only_in_${TBL2}
+ORDER BY which_table ASC
+EOF
