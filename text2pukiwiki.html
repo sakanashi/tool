@@ -98,6 +98,18 @@
        output(outputstr);
    }
 
+   function addQuotationsAndMarkdownBreaks() {
+       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
+       var lines = input.split( '\n' );
+       var outputstr = "";
+
+       for ( var i = 0; i < lines.length; i++ ) {
+           lines[i] = '> ' + lines[i] + '  \n';
+           outputstr += lines[i];
+       }
+       output(outputstr);
+   }
+
    function output(s) {
        document.getElementById('outputArea').value = s;
    }
@@ -114,6 +126,7 @@
   <br/>
   <input type="button" name="btn2Text" value="引用符" onclick="addQuotations();">
   <input type="button" name="btn2Text" value="text->markdown breaks" onclick="addMarkdownBreaks();">
+  <input type="button" name="btn2Text" value="text->引用符 + markdown breaks" onclick="addQuotationsAndMarkdownBreaks();">
   <br>
   <textarea id="outputArea" class="outputArea" rows="30" cols="100"></textarea>
 
