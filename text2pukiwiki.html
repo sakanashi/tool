@@ -1,134 +1,267 @@
+<!DOCTYPE html>
 <html lang="ja">
-<head>
-  <script type="text/javascript">
-   function text2pukiwikiTask() {
-       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-       var lines = input.split( '\n' );
-       var outputstr = "* TODO\n（※ ■: やった,  □: やれなかった）\n\n";
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Text Converter</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-       for ( var i = 0; i < lines.length; i++ ) {
-           if ( lines[i] != '' ) {
-               lines[i] += "~\n";
-               if (lines[i].match(/^(□|■|　).*/)) {
-                   lines[i] = "　" + lines[i];
-               }
-           } else {
-               lines[i] += "\n";
-           }
-           outputstr += lines[i];
-       }
-       output(outputstr);
-   }
+        <script type="text/javascript">
+         const processInput = (transformFunc) => {
+             const input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
+             const output = transformFunc(input);
+             document.getElementById('outputArea').value = output;
+         };
 
-   function text2pukiwiki() {
-       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-       var lines = input.split( '\n' );
-       var outputstr = "";
+         const text2pukiwikiTask = (input) => {
+             const lines = input.split('\n').map(line => {
+                 if (line === '') return '\n';
+                 return (line.match(/^(□|■|　).*/) ? '　' : '') + line + '~\n';
+             });
+             return "* TODO\n（※ ■: やった,  □: やれなかった）\n\n" + lines.join('');
+         };
 
-       for ( var i = 0; i < lines.length; i++ ) {
-           if ( lines[i] != '' ) {
-               lines[i] += "~\n";
-               if (lines[i].match(/^ .*/)) {
-                   lines[i].trim()
-               } else if(lines[i].match(/^　.*/)) {
-                   lines[i] = "　" + lines[i];
-               }
-           } else {
-               lines[i] += "\n";
-           }
-           outputstr += lines[i];
-       }
-       output(outputstr);
-   }
+         const text2pukiwiki = (input) => {
+             const lines = input.split('\n').map(line => {
+                 if (line === '') return '\n';
+                 return (line.match(/^(　).*/) ? '　' : '') + line.trim() + '~\n';
+             });
+             return lines.join('');
+         };
 
-   function markdown2pukiwiki(tabnum) {
-       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-       var lines = input.split( '\n' );
-       var outputstr = "";
+         const markdown2pukiwiki = (input, tabnum) => {
+             const lines = input.split('\n').map(line => {
+                 if (line === '') return '\n';
 
-       for ( var i = 0; i < lines.length; i++ ) {
-           if ( lines[i] != '' ) {
-               requireTilda = true
-               if (lines[i].startsWith('#')) {  // 見出し
-                   lines[i] = lines[i].replace(/#/g, '*');
-                   requireTilda = false
-               } else if (lines[i].trim().startsWith('*')){ // 箇条書き
-                   pattern = '-'.repeat(Math.floor((lines[i].indexOf('*') + 1) / tabnum) + 1);
-                   if (pattern.length <= 3) {
-                       lines[i] = pattern + lines[i].trim().replace(/\*/g, '');
-                   } else {
-                       lines[i] = '---' + '　 '.repeat(pattern.length - 3) + lines[i].trim().replace(/\*/g, '');
-                   }
-               } else if (lines[i].match(/^ .*/)) {  // 半角スペース始まり（とりあえずスペース削除）
-                   lines[i].trim();
-               } else if(lines[i].match(/^　.*/)) {  // 全角スペース始まり（なにもしない）
-               } else {
-               }
-               if (requireTilda) lines[i] += "~";
-               lines[i] += "\n";
-           } else {
-               lines[i] += "\n";
-           }
-           outputstr += lines[i];
-       }
-       output(outputstr);
-   }
+                 if (line.startsWith('#')) {
+                     return line.replace(/#/g, '*') + '\n';
+                 }
 
-   function addQuotations() {
-       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-       var lines = input.split( '\n' );
-       var outputstr = "";
+                 if (line.trim().startsWith('*')) {
+                     const pattern = '-'.repeat(Math.floor((line.indexOf('*') + 1) / tabnum) + 1);
+                     return (pattern.length <= 3 ? pattern : '---' + '　 '.repeat(pattern.length - 3)) + line.trim().replace(/\*/g, '') + '~\n';
+                 }
 
-       for ( var i = 0; i < lines.length; i++ ) {
-           lines[i] = '> ' + lines[i] + '\n';
-           outputstr += lines[i];
-       }
-       output(outputstr);
-   }
+                 return (line.match(/^(　).*/) ? '　' : '') + line.trim() + '~\n';
+             });
+             return lines.join('');
+         };
 
-   function addMarkdownBreaks() {
-       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-       var lines = input.split( '\n' );
-       var outputstr = "";
+         const addQuotations = (input) => {
+             return input.split('\n').map(line => '> ' + line + '\n').join('');
+         };
 
-       for ( var i = 0; i < lines.length; i++ ) {
-           lines[i] = lines[i] + '  \n';
-           outputstr += lines[i];
-       }
-       output(outputstr);
-   }
+         const addMarkdownBreaks = (input) => {
+             return input.split('\n').map(line => line + '  \n').join('');
+         };
 
-   function addQuotationsAndMarkdownBreaks() {
-       var input = document.getElementById('inputArea').value.replace(/\r\n|\r/g, "\n");
-       var lines = input.split( '\n' );
-       var outputstr = "";
+         const addQuotationsAndMarkdownBreaks = (input) => {
+             return input.split('\n').map(line => '> ' + line + '  \n').join('');
+         };
 
-       for ( var i = 0; i < lines.length; i++ ) {
-           lines[i] = '> ' + lines[i] + '  \n';
-           outputstr += lines[i];
-       }
-       output(outputstr);
-   }
+         const teams2text = (input, markdown) => {
+             const lines = input.split('\n');
+             let output = '';
+             let currentAuthor = '';
+             let currentTime = '';
+             let currentMessage = '';
 
-   function output(s) {
-       document.getElementById('outputArea').value = s;
-   }
-  </script>
-  <style type="text/css"></style>
-</head>
-<body>
+             for (let i = 0; i < lines.length; i++) {
+                 const line = lines[i].trim();
 
-  <textarea id="inputArea" class="inputArea" rows="30" cols="100"></textarea> <br>
-  <input type="button" name="btn2Text" value="text->pukiwikiTask" onclick="text2pukiwikiTask();">
-  <input type="button" name="btn2Text" value="text->pukiwiki" onclick="text2pukiwiki();">
-  <input type="button" name="btn2Text" value="markdown->pukiwiki(tab: 4)" onclick="markdown2pukiwiki(4);">
-  <input type="button" name="btn2Text" value="markdown->pukiwiki(tab: 2)" onclick="markdown2pukiwiki(2);">
-  <br/>
-  <input type="button" name="btn2Text" value="引用符" onclick="addQuotations();">
-  <input type="button" name="btn2Text" value="text->markdown breaks" onclick="addMarkdownBreaks();">
-  <input type="button" name="btn2Text" value="text->引用符 + markdown breaks" onclick="addQuotationsAndMarkdownBreaks();">
-  <br>
-  <textarea id="outputArea" class="outputArea" rows="30" cols="100"></textarea>
+                 if (line === '最後の既読' || line.endsWith('が作成') || line.match(/件の .+? リアクション。/) || line.match(/^\d$/)) {
+                     continue;
+                 }
 
-</body>
+                 const nameAndTimeMatch = line.match(/^(.+) \((.+)\)(\d{2}:\d{2})?$/);
+                 if (nameAndTimeMatch) {
+                     currentAuthor = nameAndTimeMatch[1].trim();
+                     if (nameAndTimeMatch[3]) {
+                         currentTime = nameAndTimeMatch[3].trim();
+                     }
+                 } else if (line.match(/^\d{2}:\d{2}$/)) {
+                     currentTime = line;
+                 } else {
+                     if (currentMessage) {
+                         currentMessage += `\n${line}`;
+                     } else {
+                         currentMessage = line;
+                     }
+
+                     if (i + 1 < lines.length) {
+                         const nextLine = lines[i + 1].trim();
+                         if (nextLine.match(/^(.+) \((.+)\)(\d{2}:\d{2})?$/) || nextLine.match(/^\d{2}:\d{2}$/) || nextLine === '最後の既読'
+                             || nextLine.endsWith('が作成') || nextLine.match(/件の .+? リアクション。/) || nextLine.match(/^\d$/)) {
+                             const formattedMessage = currentMessage.replace(/\n/g, '  \n');
+                             output += markdown ? `* [${currentTime}] ${currentAuthor}\n  * ${formattedMessage.replace(/\n/g, '  \n  ')}\n\n` : `[${currentTime}] ${currentAuthor}:\n${formattedMessage}\n\n`;
+
+                             currentMessage = '';
+                         }
+                     } else {
+                         const formattedMessage = currentMessage.replace(/\n/g, '  \n');
+                         output += markdown ? `* [${currentTime}] ${currentAuthor}\n  * ${formattedMessage.replace(/\n/g, '  \n  ')}\n\n` : `[${currentTime}] ${currentAuthor}:\n${formattedMessage}\n\n`;
+                     }
+                 }
+             }
+
+             return output;
+         };
+
+         const onClickText2PukiwikiTask = () => processInput(text2pukiwikiTask);
+         const onClickText2Pukiwiki = () => processInput(text2pukiwiki);
+         const onClickMarkdown2Pukiwiki = (tabnum) => processInput((input) => markdown2pukiwiki(input, tabnum));
+         const onClickAddQuotations = () => processInput(addQuotations);
+         const onClickAddMarkdownBreaks = () => processInput(addMarkdownBreaks);
+         const onClickAddQuotationsAndMarkdownBreaks = () => processInput(addQuotationsAndMarkdownBreaks);
+         const onClickTeams2Text = () => processInput(input => teams2text(input, false));
+         const onClickTeams2Markdown = () => processInput(input => teams2text(input, true));
+
+         const copyToClipboard = () => {
+             const outputArea = document.getElementById('outputArea');
+             outputArea.select();
+             document.execCommand('copy');
+             window.getSelection().removeAllRanges();
+
+             // Show the alert
+             const alertContainer = document.getElementById('alertContainer');
+             alertContainer.style.display = 'block';
+
+             // Hide the alert after 3 seconds
+             setTimeout(() => {
+                 alertContainer.style.display = 'none';
+             }, 3000);
+         };
+        </script>
+
+        <style type="text/css">
+         body {
+             font-size: 0.9rem;
+         }
+
+         .container {
+             display: flex;
+             flex-direction: column;
+             gap: 20px;
+             margin-top: 10px;
+             margin-bottom: 10px;
+         }
+
+         .button-container {
+             display: flex;
+             flex-direction: column;
+             gap: 5px;
+         }
+
+         .button-group {
+             display: flex;
+             align-items: flex-start;
+             gap: 5px;
+         }
+
+         .input-output-container {
+             display: flex;
+             flex-direction: row;
+             align-items: flex-start;
+             gap: 20px;
+         }
+
+         .input-area {
+             display: flex;
+             flex-direction: column;
+             gap: 10px;
+             position: relative;
+             display: inline-block;
+         }
+
+         textarea {
+             width: 100%;
+             min-width: 45vw;
+             height: 70vh;
+             resize: both;
+         }
+
+         .alert {
+             position: relative;
+             animation: slide-in 0.5s forwards;
+         }
+
+         @keyframes slide-in {
+             from {
+                 top: -50px;
+                 opacity: 0;
+             }
+             to {
+                 top: 0;
+                 opacity: 1;
+             }
+         }
+         .copy-button {
+             position: absolute;
+             top: 5px;
+             right: 5px;
+             padding: 2px 8px;
+             font-size: 14px;
+             border-radius: 20px;
+             background-color: transparent;
+             color: #007bff;
+             border: 1px solid #007bff;
+         }
+
+         .copy-button:hover {
+             background-color: #007bff;
+             color: white;
+         }
+        </style>
+    </head>
+    <body class="bg-light">
+        <div class="container">
+            <div class="button-container">
+                <div class="button-group row-cols">
+                    <div class="col-2">
+                        <h5>To Pukiwiki</h5>
+                    </div>
+                    <div class="col-auto">
+                        <button class="col btn btn-outline-primary btn-sm" onclick="onClickText2PukiwikiTask();">Text → Pukiwiki Task</button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="onClickMarkdown2Pukiwiki(0);">Text →Pukiwiki</button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="onClickMarkdown2Pukiwiki(1);">Markdown → Pukiwiki (tab: 1)</button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="onClickMarkdown2Pukiwiki(2);">Markdown → Pukiwiki (tab: 2)</button>
+                    </div>
+                </div>
+                <div class="button-group row-cols">
+                    <div class="col-2">
+                        <h5>To Gitlab Markdown</h5>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-outline-primary btn-sm" onclick="onClickAddQuotations();">引用符+改行</button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="onClickRemoveQuotations();">改行</button>
+                    </div>
+                </div>
+                <div class="button-group row-cols">
+                    <div class="col-2">
+                        <h5>From Teams Chat</h5>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-outline-primary btn-sm" onclick="onClickTeams2Text();">Teams → Text</button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="onClickTeams2Markdown();">Teams → Markdown</button>
+                    </div>
+                </div>
+            </div>
+            <div class="input-output-container">
+                <div class="input-area">
+                    <textarea id="inputArea" class="form-control" rows="10" placeholder="Input"></textarea>
+                </div>
+                <div class="input-area">
+                    <textarea id="outputArea" class="form-control" rows="10" placeholder="Output"></textarea>
+                    <button id="copyButton" class="btn btn-primary copy-button" onclick="copyToClipboard();">📋 Copy</button>
+                </div>
+            </div>
+            <!-- Add this after the Copy to Clipboard button -->
+            <div id="alertContainer" class="mt-2" style="display: none; position: fixed; bottom: 0; width: 20%;">
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="z-index: 9999;">
+                    Copied to clipboard!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
